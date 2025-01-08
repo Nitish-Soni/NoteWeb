@@ -1,0 +1,111 @@
+.Navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.AppIcon {
+  margin: 0;
+  padding: 0;
+  margin-left: 20px;
+  cursor: pointer;
+  font-size: 20px;
+  font-family: "Courier New", Courier, monospace;
+  text-decoration: none;
+}
+
+.NavbarButtons {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AccountButton {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.LoginButton {
+  margin: 0;
+  padding: 10px;
+  margin-right: 5px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  font-family: "Courier New", Courier, monospace;
+  text-decoration: none;
+}
+
+.SignupButton {
+  margin: 0;
+  padding: 10px;
+  margin-right: 20px;
+  cursor: pointer;
+  background: transparent;
+  background-color: green;
+  color: white;
+  border: none;
+  font-size: 15px;
+  font-family: "Courier New", Courier, monospace;
+  border-radius: 15px;
+  text-decoration: none;
+}
+
+.ToggleButton {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ModeButtonOff {
+  margin: 0;
+  padding: 0;
+  margin-right: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 25px;
+}
+
+.ModeButtonOn {
+  margin: 0;
+  padding: 0;
+  margin-right: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: black;
+  font-size: 25px;
+}
+
+.content {
+  margin: 0;
+  padding: 0;
+  margin-top: 60px;
+  width: 100%;
+  height: calc(100vh - 60px);
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
