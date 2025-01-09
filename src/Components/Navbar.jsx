@@ -28,10 +28,15 @@ export default function Navbar() {
         <div className="NavbarButtons">
           <div className="AccountButton">
             <Link to="/login" className="LoginButton" style={LinkButton}>
-              Login <FontAwesomeIcon icon={faRightToBracket} />
+              Login{" "}
+              <FontAwesomeIcon
+                icon={faRightToBracket}
+                style={{ marginLeft: "5px" }}
+              />
             </Link>
             <Link to="/signup" className="SignupButton">
-              SignUp <FontAwesomeIcon icon={faUser} />
+              SignUp{" "}
+              <FontAwesomeIcon icon={faUser} style={{ marginLeft: "5px" }} />
             </Link>
           </div>
           <div className="ToggleButton">

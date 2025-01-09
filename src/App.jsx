@@ -5,6 +5,7 @@ import SignInPage from "./Pages/SignInPage";
 import SignUpPage from "./Pages/SignUpPage";
 import Navbar from "./Components/Navbar";
 import HomePage from "./Pages/HomePage";
+import Footer from "./Components/Footer";
 export const ApplicationContext = createContext("");
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Route path="/signup" element={<SignUpPage />} />
           </Routes>
         </div>
+        <Footer />
       </ApplicationContext.Provider>
     </Router>
   );
