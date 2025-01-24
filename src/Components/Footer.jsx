@@ -35,44 +35,48 @@ export default function Footer() {
           <div className="FooterSecond">
             <div className="FooterSocial">
               <a
-                className="FooterSocialLink"
                 href="https://www.linkedin.com/in/-nitish-soni-/"
                 target="_blank"
                 style={SocilaLinkColor}
               >
-                <FontAwesomeIcon icon={faLinkedin} />
+                <FontAwesomeIcon
+                  icon={faLinkedin}
+                  className="FooterSocialLink"
+                />
               </a>
               <a
-                className="FooterSocialLink"
                 href="https://github.com/Nitish-Soni"
                 target="_blank"
                 style={SocilaLinkColor}
               >
-                <FontAwesomeIcon icon={faGithub} />
+                <FontAwesomeIcon icon={faGithub} className="FooterSocialLink" />
               </a>
               <a
-                className="FooterSocialLink"
                 href="mailto:nitishsoni890@gmail.com"
                 target="_blank"
                 style={SocilaLinkColor}
               >
-                <FontAwesomeIcon icon={faGoogle} />
+                <FontAwesomeIcon icon={faGoogle} className="FooterSocialLink" />
               </a>
               <a
-                className="FooterSocialLink"
                 href="https://www.instagram.com/_2nitish6_/"
                 target="_blank"
                 style={SocilaLinkColor}
               >
-                <FontAwesomeIcon icon={faInstagram} />
+                <FontAwesomeIcon
+                  icon={faInstagram}
+                  className="FooterSocialLink"
+                />
               </a>
               <a
-                className="FooterSocialLink"
                 href="https://x.com/_2nitish6_"
                 target="_blank"
                 style={SocilaLinkColor}
               >
-                <FontAwesomeIcon icon={faTwitter} />
+                <FontAwesomeIcon
+                  icon={faTwitter}
+                  className="FooterSocialLink"
+                />
               </a>
             </div>
           </div>

@@ -116,6 +116,79 @@
   overflow-y: scroll;
 }
 
+.LoginContent {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.LoginForm {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+  border-radius: 10px;
+}
+
+.FormHeader {
+  font-family: "Courier New", Courier, monospace;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.FormLabel {
+  width: 100%;
+  text-align: left;
+}
+
+.FormElement {
+  margin-top: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: transparent;
+  width: 95%;
+  border-radius: 10px;
+}
+
+.FormLoginButton {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  width: 40%;
+  align-self: flex-end;
+  height: 35px;
+  border-radius: 10px;
+  border: none;
+}
+
+.FormLoginButton:hover {
+  transform: scale(1.025);
+}
+
+.FormSeperator {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.LoginSocialIcon {
+  margin: 15px;
+  cursor: pointer;
+  padding: 5px;
+  width: 35px;
+  height: 35px;
+}
+
+.LoginSocialIcon:hover {
+  transform: scale(1.1);
+}
+
 .Footer {
   margin: 0;
   padding: 0;
@@ -166,7 +239,7 @@
 }
 
 .FooterSocialLink:hover {
-  font-size: 35px;
+  transform: scale(1.1);
 }
 
 .Copyright {
