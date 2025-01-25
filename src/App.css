@@ -142,7 +142,7 @@
   font-family: "Courier New", Courier, monospace;
   margin: 0;
   padding: 0;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .FormLabel {
@@ -152,7 +152,7 @@
 
 .FormElement {
   margin-top: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   padding: 10px;
   background: transparent;
   width: 95%;
@@ -161,6 +161,9 @@
 
 .FormLoginButton,
 .FormSignupButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 10px;
   margin-bottom: 20px;
   width: 40%;
@@ -168,10 +171,16 @@
   height: 35px;
   border-radius: 10px;
   border: none;
+  cursor: pointer;
+}
+
+.FormSignupButton:disabled {
+  opacity: 50%;
+  cursor: not-allowed;
 }
 
 .FormLoginButton:hover,
-.FormSignupButton:hover {
+.FormSignupButton:enabled:hover {
   transform: scale(1.025);
 }
 
@@ -195,6 +204,49 @@
 .LoginSocialIcon:hover,
 .SignUpSocialIcon:hover {
   transform: scale(1.1);
+}
+
+.PasswordStrengthCheck {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  align-self: flex-start;
+  margin-bottom: 5px;
+}
+
+.PasswordStrengthLevel {
+  height: 10px;
+  border-radius: 5px;
+}
+
+.SignUpAvatarContainer {
+  width: 150px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0;
+}
+
+.SignUpProfileAvatar {
+  width: 70px;
+  height: 70px;
+  border: 1px solid;
+  border-radius: 50%;
+  margin: 0;
+  padding: 0;
+}
+
+.ImageChangerButton {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .Footer {
@@ -253,4 +305,22 @@
 .Copyright {
   margin: 0;
   padding: 10px;
+}
+
+.LoaderSpinner {
+  border: 2px solid #939090b1; /* Light grey background */
+  border-top: 2px solid; /* Blue spinner */
+  border-radius: 50%; /* Circular shape */
+  width: 15px;
+  height: 15px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

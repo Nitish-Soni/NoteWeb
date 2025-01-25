@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ApplicationContext } from "../App";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,9 +7,16 @@ import {
   faGoogle,
   faMicrosoft,
 } from "@fortawesome/free-brands-svg-icons";
+import { AppDatabase, get, ref, set, remove } from "../Database/Firebase";
+import md5 from "md5";
 
 export default function SignInPage() {
   const { Mode } = useContext(ApplicationContext);
+  const [EmailValue, SetEmailValue] = useState("");
+  const [PasswordValue, SetPasswordValue] = useState("");
+  const [Loader, SetLoader] = useState(false);
+  const [Text, SetText] = useState("");
+
   const ButtonStyle = {
     background: Mode ? "white" : "black",
     color: Mode ? "black" : "white",
@@ -21,6 +28,57 @@ export default function SignInPage() {
   const FormColor = {
     backgroundColor: Mode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
   };
+  const ResponseTextStyler = {
+    color: Text === "Login Successful" ? "green" : "red",
+    margin: 0,
+    padding: 0,
+  };
+
+  async function FormSubmitHandler(event) {
+    event.preventDefault();
+    SetLoader(true);
+    try {
+      const hashedEmail = md5(EmailValue);
+      const userRef = ref(AppDatabase, `/Users/${hashedEmail}`);
+      const snapshot = await get(userRef);
+      if (!snapshot.exists()) {
+        SetText("User does not Exist");
+        SetLoader(false);
+        return;
+      }
+      const userData = snapshot.val();
+      const storedPassword = userData.UserPassword;
+      if (storedPassword !== md5(PasswordValue)) {
+        SetText("Incorrect Credentials");
+        SetLoader(false);
+        return;
+      }
+      SetText("Login Successful");
+      let CurrentTime = Date.now();
+      let SessionToken = md5(EmailValue + CurrentTime);
+      let TokenExpiryTime = CurrentTime + 3 * 86400000;
+      try {
+        const TokenRef = ref(AppDatabase, `/SessionTokens/${SessionToken}`);
+        await set(TokenRef, {
+          SessionToken: SessionToken,
+          CreateDate: CurrentTime,
+          ExpiryTime: TokenExpiryTime,
+          SessionFor: EmailValue,
+        });
+        document.cookie = "authToken" + "=" + SessionToken + ";path=/";
+        SetLoader(false);
+        SetEmailValue("");
+        SetPasswordValue("");
+      } catch (error) {
+        SetText("An error occurred: " + error.message);
+        SetLoader(false);
+      }
+    } catch (error) {
+      SetText("An error occurred: " + error.message);
+      SetLoader(false);
+    }
+  }
+
   return (
     <>
       <div className="LoginContent">
@@ -29,6 +87,9 @@ export default function SignInPage() {
           id="LoginForm"
           className="LoginForm"
           style={FormColor}
+          onSubmit={(event) => {
+            FormSubmitHandler(event);
+          }}
         >
           <h3 className="FormHeader">Login</h3>
           <label htmlFor="LoginEmail" className="FormLabel">
@@ -39,6 +100,11 @@ export default function SignInPage() {
             id="LoginEmail"
             className="FormElement"
             style={ElementStyle}
+            value={EmailValue}
+            onChange={(event) => {
+              let TempEmail = event.target.value;
+              SetEmailValue(TempEmail);
+            }}
             required
           />
           <label htmlFor="LoginPassword" className="FormLabel">
@@ -49,10 +115,16 @@ export default function SignInPage() {
             id="LoginPassword"
             className="FormElement"
             style={ElementStyle}
+            value={PasswordValue}
+            onChange={(event) => {
+              let TempPassword = event.target.value;
+              SetPasswordValue(TempPassword);
+            }}
             required
           />
+          {Text ? <h5 style={ResponseTextStyler}>{Text}</h5> : null}
           <button type="submit" className="FormLoginButton" style={ButtonStyle}>
-            Log On
+            {Loader ? <div className="LoaderSpinner"></div> : "Log On"}
           </button>
           <div className="SignUpLink">
             Forgot Password ?{" "}
