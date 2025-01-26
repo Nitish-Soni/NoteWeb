@@ -29,7 +29,7 @@ export default function AccountDetails() {
         remove(TokenRef);
         Cookies.remove("authToken");
         SetLoggedIn(false);
-        window.location.href = "/login";
+        window.location.href = "/";
       }
       SetShowAccountDetails(false);
     } catch (error) {
