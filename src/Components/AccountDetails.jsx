@@ -22,14 +22,13 @@ export default function AccountDetails() {
 
   async function handleLogOff() {
     let CookieValue = Cookies.get("authToken");
-    SetLoggedIn(false);
     try {
       const TokenRef = ref(AppDatabase, `/SessionTokens/${CookieValue}`);
       const snapshot = await get(TokenRef);
       if (snapshot.exists()) {
         remove(TokenRef);
         Cookies.remove("authToken");
-
+        SetLoggedIn(false);
         window.location.href = "/login";
       }
       SetShowAccountDetails(false);
