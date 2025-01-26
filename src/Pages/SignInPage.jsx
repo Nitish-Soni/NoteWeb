@@ -11,7 +11,7 @@ import { AppDatabase, get, ref, set, remove } from "../Database/Firebase";
 import md5 from "md5";
 
 export default function SignInPage() {
-  const { Mode } = useContext(ApplicationContext);
+  const { Mode, SetLoggedIn } = useContext(ApplicationContext);
   const [EmailValue, SetEmailValue] = useState("");
   const [PasswordValue, SetPasswordValue] = useState("");
   const [Loader, SetLoader] = useState(false);
@@ -53,7 +53,6 @@ export default function SignInPage() {
         SetLoader(false);
         return;
       }
-      SetText("Login Successful");
       let CurrentTime = Date.now();
       let SessionToken = md5(EmailValue + CurrentTime);
       let TokenExpiryTime = CurrentTime + 3 * 86400000;
@@ -67,8 +66,10 @@ export default function SignInPage() {
         });
         document.cookie = "authToken" + "=" + SessionToken + ";path=/";
         SetLoader(false);
+        SetLoggedIn(true);
         SetEmailValue("");
         SetPasswordValue("");
+        window.location.href = "/";
       } catch (error) {
         SetText("An error occurred: " + error.message);
         SetLoader(false);

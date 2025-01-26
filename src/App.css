@@ -70,6 +70,104 @@
   text-decoration: none;
 }
 
+.NotificationButton {
+  margin: 0;
+  padding: 0;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.NotificationDot {
+  position: absolute;
+  margin-bottom: 10px;
+  margin-left: 20px;
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
+  border: 1px solid;
+}
+
+.NotificationTab {
+  width: 300px;
+  height: 400px;
+  position: fixed;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid;
+}
+
+.AccountDetailsTab {
+  width: 150px;
+  height: 150px;
+  position: fixed;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.CloseButton {
+  background: none;
+  border: none;
+  margin: 5px;
+  padding: 0;
+  align-self: flex-end;
+  cursor: pointer;
+}
+
+.AccountDetailsList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.AccountDetailsListItem {
+  font-size: 15px;
+  margin: 5px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.AccountDetailsListItem:hover {
+  transform: scale(1.1);
+}
+
+.AccountDetailsButton {
+  margin: 0;
+  padding: 0;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.AccountAvatar {
+  width: 35px;
+  height: 35px;
+  padding: 0;
+  margin: 0;
+}
+
 .ToggleButton {
   margin: 0;
   padding: 0;
