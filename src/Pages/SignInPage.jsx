@@ -7,11 +7,11 @@ import {
   faGoogle,
   faMicrosoft,
 } from "@fortawesome/free-brands-svg-icons";
-import { AppDatabase, get, ref, set, remove } from "../Database/Firebase";
+import { AppDatabase, get, ref, set } from "../Database/Firebase";
 import md5 from "md5";
 
 export default function SignInPage() {
-  const { Mode, SetLoggedIn } = useContext(ApplicationContext);
+  const { Mode, SetLoggedIn, SetLoading } = useContext(ApplicationContext);
   const [EmailValue, SetEmailValue] = useState("");
   const [PasswordValue, SetPasswordValue] = useState("");
   const [Loader, SetLoader] = useState(false);
@@ -37,6 +37,7 @@ export default function SignInPage() {
   async function FormSubmitHandler(event) {
     event.preventDefault();
     SetLoader(true);
+    SetLoading(true);
     try {
       const hashedEmail = md5(EmailValue);
       const userRef = ref(AppDatabase, `/Users/${hashedEmail}`);

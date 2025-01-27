@@ -115,6 +115,7 @@ function App() {
               SetShowAccountDetails,
               UserData,
               SetUserData,
+              SetLoading
             }}
           >
             <Navbar />
