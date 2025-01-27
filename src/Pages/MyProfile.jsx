@@ -1,7 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { ApplicationContext } from "../App";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretLeft, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretLeft,
+  faCaretRight,
+  faEdit,
+  faFloppyDisk,
+} from "@fortawesome/free-solid-svg-icons";
 import AvatarArray from "../Components/UserAvatar";
 import zxcvbn from "zxcvbn";
 import md5 from "md5";
@@ -19,6 +24,7 @@ export default function MyProfile() {
   const [PasswordStrength, SetPasswordStrength] = useState("");
   const [PasswordMatch, SetPasswordMatch] = useState(false);
   const [Text, SetText] = useState("");
+  const [EditAvatar, SetEditAvatar] = useState(false);
 
   let ButtonValue = EditProfile ? "Save" : "Change Password";
 
@@ -31,8 +37,12 @@ export default function MyProfile() {
     margin: "3px",
   };
   const ResponseTextStyler = {
-    color: Text === "Password Changed Successfully" ? "green" : "red",
-    margin: 0,
+    color:
+      Text === "Password Changed Successfully" || Text === "User Avatar Updated"
+        ? "green"
+        : "red",
+    margin: "0",
+    marginBottom: "10px",
     padding: 0,
   };
   const ElementStyle = {
@@ -67,6 +77,9 @@ export default function MyProfile() {
         : PasswordStrength === 4
         ? "green"
         : "transparent",
+  };
+  const AvatarButtonStyle = {
+    color: Mode ? "white" : "black",
   };
 
   useEffect(() => {
@@ -120,7 +133,6 @@ export default function MyProfile() {
             SetEditProfile(false);
             SetUserData({
               ...UserData,
-              SelectedAvatar: SelectedAvatar,
               UserPassword: md5(NewPasswordValue),
             });
             setTimeout(() => {
@@ -148,6 +160,31 @@ export default function MyProfile() {
     }
   }
 
+  async function HandelAvatarSave() {
+    const userRef = ref(AppDatabase, `/Users/${UserData.UserName}`);
+    try {
+      await set(userRef, {
+        FirstName: UserData.FirstName,
+        LastName: UserData.LastName,
+        UserEmail: UserData.UserEmail,
+        UserName: UserData.UserName,
+        UserPassword: UserData.UserPassword,
+        SelectedAvatar: SelectedAvatar,
+      });
+      SetEditAvatar(false);
+      SetUserData({ ...UserData, SelectedAvatar: SelectedAvatar });
+      SetText("User Avatar Updated");
+      setTimeout(() => {
+        SetText("");
+      }, 800);
+    } catch (error) {
+      SetText(error);
+      setTimeout(() => {
+        SetText("");
+      }, 800);
+    }
+  }
+
   return (
     <>
       <div className="MyProfileContainer">
@@ -161,41 +198,66 @@ export default function MyProfile() {
         >
           <h3 className="FormHeader">My Profile</h3>
           <div className="SignUpAvatarContainer">
-            <button
-              className="ImageChangerButton"
-              type="button"
-              style={ButtonStyle}
-              onClick={() => {
-                if (SelectedAvatar === 0) {
-                  SetSelectedAvatar(8);
-                } else {
-                  SetSelectedAvatar(SelectedAvatar - 1);
-                }
-              }}
-              disabled={EditProfile ? false : true}
-            >
-              <FontAwesomeIcon icon={faCaretLeft} />
-            </button>
+            {EditAvatar ? (
+              <button
+                className="ImageChangerButton"
+                type="button"
+                style={AvatarButtonStyle}
+                onClick={() => {
+                  if (SelectedAvatar === 0) {
+                    SetSelectedAvatar(8);
+                  } else {
+                    SetSelectedAvatar(SelectedAvatar - 1);
+                  }
+                }}
+              >
+                <FontAwesomeIcon icon={faCaretLeft} />
+              </button>
+            ) : null}
             <img
               alt="..."
               className="SignUpProfileAvatar"
               src={AvatarArray[SelectedAvatar]}
             ></img>
-            <button
-              className="ImageChangerButton"
-              type="button"
-              style={ButtonStyle}
-              onClick={() => {
-                if (SelectedAvatar === 8) {
-                  SetSelectedAvatar(0);
-                } else {
-                  SetSelectedAvatar(SelectedAvatar + 1);
-                }
-              }}
-              disabled={EditProfile ? false : true}
-            >
-              <FontAwesomeIcon icon={faCaretRight} />
-            </button>
+            {EditAvatar ? (
+              <button
+                className="AvatarButton"
+                type="button"
+                style={AvatarButtonStyle}
+                onClick={() => {
+                  HandelAvatarSave();
+                }}
+              >
+                <FontAwesomeIcon icon={faFloppyDisk} />
+              </button>
+            ) : (
+              <button
+                className="AvatarButton"
+                type="button"
+                style={AvatarButtonStyle}
+                onClick={() => {
+                  SetEditAvatar(true);
+                }}
+              >
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+            )}
+            {EditAvatar ? (
+              <button
+                className="ImageChangerButton"
+                type="button"
+                style={AvatarButtonStyle}
+                onClick={() => {
+                  if (SelectedAvatar === 8) {
+                    SetSelectedAvatar(0);
+                  } else {
+                    SetSelectedAvatar(SelectedAvatar + 1);
+                  }
+                }}
+              >
+                <FontAwesomeIcon icon={faCaretRight} />
+              </button>
+            ) : null}
           </div>
           <label htmlFor="MyProfileFirstName" className="MyProfileLabel">
             First Name:
