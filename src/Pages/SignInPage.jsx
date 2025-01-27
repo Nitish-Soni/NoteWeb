@@ -11,7 +11,7 @@ import { AppDatabase, get, ref, set } from "../Database/Firebase";
 import md5 from "md5";
 
 export default function SignInPage() {
-  const { Mode, SetLoggedIn, SetLoading } = useContext(ApplicationContext);
+  const { Mode, SetLoggedIn } = useContext(ApplicationContext);
   const [EmailValue, SetEmailValue] = useState("");
   const [PasswordValue, SetPasswordValue] = useState("");
   const [Loader, SetLoader] = useState(false);
@@ -37,7 +37,6 @@ export default function SignInPage() {
   async function FormSubmitHandler(event) {
     event.preventDefault();
     SetLoader(true);
-    SetLoading(true);
     try {
       const hashedEmail = md5(EmailValue);
       const userRef = ref(AppDatabase, `/Users/${hashedEmail}`);
@@ -58,13 +57,17 @@ export default function SignInPage() {
       let SessionToken = md5(EmailValue + CurrentTime);
       let TokenExpiryTime = CurrentTime + 3 * 86400000;
       try {
-        const TokenRef = ref(AppDatabase, `/SessionTokens/${SessionToken}`);
+        const TokenRef = ref(
+          AppDatabase,
+          `/SessionTokens/${md5(EmailValue)}/${SessionToken}`
+        );
         await set(TokenRef, {
           SessionToken: SessionToken,
           CreateDate: CurrentTime,
           ExpiryTime: TokenExpiryTime,
           SessionFor: EmailValue,
         });
+        document.cookie = "userReference" + "=" + md5(EmailValue) + ";path=/";
         document.cookie = "authToken" + "=" + SessionToken + ";path=/";
         SetLoader(false);
         SetLoggedIn(true);

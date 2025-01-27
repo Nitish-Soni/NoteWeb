@@ -10,7 +10,7 @@ import {
 import AvatarArray from "../Components/UserAvatar";
 import zxcvbn from "zxcvbn";
 import md5 from "md5";
-import { ref, set } from "firebase/database";
+import { get, ref, remove, set } from "firebase/database";
 import { AppDatabase } from "../Database/Firebase";
 
 export default function MyProfile() {
@@ -135,6 +135,30 @@ export default function MyProfile() {
               ...UserData,
               UserPassword: md5(NewPasswordValue),
             });
+            const TokenRef = ref(
+              AppDatabase,
+              `/SessionTokens/${UserData.UserName}`
+            );
+            let CurrentTime = Date.now();
+            let SessionToken = md5(UserData.UserEmail + CurrentTime);
+            let TokenExpiryTime = CurrentTime + 3 * 86400000;
+            const UpdatedSessionToken = {
+              SessionToken: SessionToken,
+              CreateDate: CurrentTime,
+              ExpiryTime: TokenExpiryTime,
+              SessionFor: UserData.UserEmail,
+            };
+            await remove(TokenRef);
+            await set(
+              ref(
+                AppDatabase,
+                `/SessionTokens/${UserData.UserName}/${SessionToken}`
+              ),
+              UpdatedSessionToken
+            );
+            document.cookie =
+              "userReference" + "=" + md5(UserData.UserEmail) + ";path=/";
+            document.cookie = "authToken" + "=" + SessionToken + ";path=/";
             setTimeout(() => {
               SetText("");
             }, 800);

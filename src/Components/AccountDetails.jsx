@@ -22,9 +22,13 @@ export default function AccountDetails() {
   };
 
   async function handleLogOff() {
+    let UserValue = Cookies.get("userReference");
     let CookieValue = Cookies.get("authToken");
     try {
-      const TokenRef = ref(AppDatabase, `/SessionTokens/${CookieValue}`);
+      const TokenRef = ref(
+        AppDatabase,
+        `/SessionTokens/${UserValue}/${CookieValue}`
+      );
       const snapshot = await get(TokenRef);
       if (snapshot.exists()) {
         remove(TokenRef);

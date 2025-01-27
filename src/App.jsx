@@ -38,16 +38,22 @@ function App() {
   useEffect(() => {
     async function checkSession() {
       SetLoading(true);
+      const UserValue = Cookies.get("userReference");
       const CookieValue = Cookies.get("authToken");
 
-      if (CookieValue) {
+      if (CookieValue || UserValue) {
         try {
-          const TokenRef = ref(AppDatabase, `/SessionTokens/${CookieValue}`);
-          const snapshot = await get(TokenRef);
+          const UserRef = ref(AppDatabase, `/SessionTokens/${UserValue}`);
+          const snapshot = await get(UserRef);
           const CurrentTime = Date.now();
 
           if (snapshot.exists()) {
-            if (CurrentTime > snapshot.val().ExpiryTime) {
+            const TokenRef = ref(
+              AppDatabase,
+              `/SessionTokens/${UserValue}/${CookieValue}`
+            );
+            const TokenSnapshot = await get(TokenRef);
+            if (CurrentTime > TokenSnapshot.val().ExpiryTime) {
               SetLoggedIn(false);
               window.location.href = "/login"; // Redirecting to login if session expired
             } else {
@@ -56,14 +62,14 @@ function App() {
                 SessionToken: CookieValue,
                 CreateDate: CurrentTime,
                 ExpiryTime: TokenExpiryTime,
-                SessionFor: snapshot.val().SessionFor,
+                SessionFor: TokenSnapshot.val().SessionFor,
               });
 
-              const UserRef = ref(
+              const UserDetailsRef = ref(
                 AppDatabase,
-                `/Users/${md5(snapshot.val().SessionFor)}`
+                `/Users/${md5(TokenSnapshot.val().SessionFor)}`
               );
-              const UserDataRef = await get(UserRef);
+              const UserDataRef = await get(UserDetailsRef);
               SetUserData(UserDataRef.val());
               SetLoggedIn(true);
             }
@@ -115,7 +121,7 @@ function App() {
               SetShowAccountDetails,
               UserData,
               SetUserData,
-              SetLoading
+              SetLoading,
             }}
           >
             <Navbar />
