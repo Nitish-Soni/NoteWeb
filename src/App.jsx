@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { createContext, useEffect, useState } from "react";
 import "./App.css";
 import SignInPage from "./Pages/SignInPage";
@@ -31,51 +36,53 @@ function App() {
   };
 
   useEffect(() => {
-    async function PageLoader() {
+    async function checkSession() {
       SetLoading(true);
-      let CookieValue = Cookies.get("authToken");
-      if (CookieValue !== undefined || CookieValue === "") {
+      const CookieValue = Cookies.get("authToken");
+
+      if (CookieValue) {
         try {
           const TokenRef = ref(AppDatabase, `/SessionTokens/${CookieValue}`);
           const snapshot = await get(TokenRef);
-          let CurrentTime = Date.now();
+          const CurrentTime = Date.now();
+
           if (snapshot.exists()) {
             if (CurrentTime > snapshot.val().ExpiryTime) {
-              SetLoading(false);
               SetLoggedIn(false);
-              window.location.href = "/login";
+              window.location.href = "/login"; // Redirecting to login if session expired
             } else {
-              let TokenExpiryTime = CurrentTime + 3 * 86400000;
-              try {
-                const UserRef = ref(
-                  AppDatabase,
-                  `/Users/${md5(snapshot.val().SessionFor)}`
-                );
-                await set(TokenRef, {
-                  SessionToken: CookieValue,
-                  CreateDate: CurrentTime,
-                  ExpiryTime: TokenExpiryTime,
-                  SessionFor: snapshot.val().SessionFor,
-                });
-                let UserDataRef = await get(UserRef);
-                SetUserData(UserDataRef.val());
-                SetLoading(false);
-                SetLoggedIn(true);
-              } catch (error) {
-                console.log(error);
-              }
+              const TokenExpiryTime = CurrentTime + 3 * 86400000; // 3 days
+              await set(TokenRef, {
+                SessionToken: CookieValue,
+                CreateDate: CurrentTime,
+                ExpiryTime: TokenExpiryTime,
+                SessionFor: snapshot.val().SessionFor,
+              });
+
+              const UserRef = ref(
+                AppDatabase,
+                `/Users/${md5(snapshot.val().SessionFor)}`
+              );
+              const UserDataRef = await get(UserRef);
+              SetUserData(UserDataRef.val());
+              SetLoggedIn(true);
             }
+          } else {
+            SetLoggedIn(false);
           }
         } catch (error) {
-          console.log(error);
+          console.error(error);
+          SetLoggedIn(false);
         }
       } else {
         SetLoggedIn(false);
-        SetLoading(false);
       }
+
+      SetLoading(false);
     }
-    PageLoader();
-  }, []);
+
+    checkSession();
+  }, []); // Empty dependency array to run on component mount
 
   return (
     <>
@@ -111,26 +118,24 @@ function App() {
             }}
           >
             <Navbar />
-            {ShowNotification ? <NotificationTab /> : null}
-            {ShowAccountDetails ? <AccountDetails /> : null}
+            {ShowNotification && <NotificationTab />}
+            {ShowAccountDetails && <AccountDetails />}
             <div className="content" style={ContentStyle}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                {LoggedIn ? (
-                  <Route path="/login" element={<PageNotFound />} />
-                ) : (
-                  <Route path="/login" element={<SignInPage />} />
-                )}
-                {LoggedIn ? (
-                  <Route path="/signup" element={<PageNotFound />} />
-                ) : (
-                  <Route path="/signup" element={<SignUpPage />} />
-                )}
-                {LoggedIn ? (
-                  <Route path="/myprofile" element={<MyProfile />} />
-                ) : (
-                  <Route path="/myprofile" element={<PageNotFound />} />
-                )}
+                <Route
+                  path="/login"
+                  element={LoggedIn ? <Navigate to="/" /> : <SignInPage />}
+                />
+                <Route
+                  path="/signup"
+                  element={LoggedIn ? <Navigate to="/" /> : <SignUpPage />}
+                />
+                <Route
+                  path="/myprofile"
+                  element={LoggedIn ? <MyProfile /> : <Navigate to="/login" />}
+                />
+                <Route path="*" element={<PageNotFound />} />
               </Routes>
             </div>
             <Footer />
