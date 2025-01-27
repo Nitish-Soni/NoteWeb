@@ -1,0 +1,7 @@
+/public
+|_ index.html
+|_ _redirects
+/src
+|_ App.js
+|\_ index.js
+...
