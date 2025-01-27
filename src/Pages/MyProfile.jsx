@@ -1,21 +1,25 @@
+// Importing necessary libraries and components
 import { useContext, useEffect, useState } from "react";
-import { ApplicationContext } from "../App";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ApplicationContext } from "../App"; // App context to manage global state
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // FontAwesome for icons
 import {
   faCaretLeft,
   faCaretRight,
   faEdit,
   faFloppyDisk,
-} from "@fortawesome/free-solid-svg-icons";
-import AvatarArray from "../Components/UserAvatar";
-import zxcvbn from "zxcvbn";
-import md5 from "md5";
-import { get, ref, remove, set } from "firebase/database";
-import { AppDatabase } from "../Database/Firebase";
+} from "@fortawesome/free-solid-svg-icons"; // Specific icons from FontAwesome
+import AvatarArray from "../Components/UserAvatar"; // Array of avatar images
+import zxcvbn from "zxcvbn"; // Password strength checker
+import md5 from "md5"; // MD5 hashing for password comparison
+import { get, ref, remove, set } from "firebase/database"; // Firebase functions
+import { AppDatabase } from "../Database/Firebase"; // Firebase database reference
 
+// Main Profile Component
 export default function MyProfile() {
+  // Extracting necessary state and context values
   const { UserData, Mode, SetUserData } = useContext(ApplicationContext);
 
+  // Local state hooks for various form elements and actions
   const [SelectedAvatar, SetSelectedAvatar] = useState(UserData.SelectedAvatar);
   const [EditProfile, SetEditProfile] = useState(false);
   const [PasswordValue, SetPasswordValue] = useState(UserData.UserPassword);
@@ -26,8 +30,10 @@ export default function MyProfile() {
   const [Text, SetText] = useState("");
   const [EditAvatar, SetEditAvatar] = useState(false);
 
+  // Conditional button text based on profile editing state
   let ButtonValue = EditProfile ? "Save" : "Change Password";
 
+  // Styling for various elements based on light/dark mode
   const ButtonStyle = {
     background: Mode ? "white" : "black",
     color: Mode ? "black" : "white",
@@ -82,11 +88,15 @@ export default function MyProfile() {
     color: Mode ? "white" : "black",
   };
 
+  // useEffect hook to monitor changes in the new password and confirm password fields
   useEffect(() => {
+    // Validate password strength using zxcvbn
     function PasswordStrengthValidation() {
       let result = zxcvbn(NewPasswordValue);
       SetPasswordStrength(result.score);
     }
+
+    // Check if the new password and confirm password match
     function PasswordConfirmPasswordMatchValidation() {
       if (NewPasswordValue === "") {
         SetPasswordMatch(false);
@@ -98,43 +108,48 @@ export default function MyProfile() {
         SetPasswordMatch(false);
       }
     }
+
     PasswordStrengthValidation();
     PasswordConfirmPasswordMatchValidation();
   }, [NewPasswordValue, ConfirmPasswordValue]);
 
+  // Handle form submission for profile updates
   async function FormSubmitHandler(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent the default form submission
     if (ButtonValue === "Change Password") {
-      SetPasswordValue("");
+      SetPasswordValue(""); // Reset password fields for change
       SetConfirmPasswordValue("");
       SetNewPasswordValue("");
-      SetEditProfile(true);
+      SetEditProfile(true); // Enable password edit mode
     } else if (ButtonValue === "Save") {
       if (md5(PasswordValue) === UserData.UserPassword) {
         if (NewPasswordValue === ConfirmPasswordValue) {
           if (md5(NewPasswordValue) === UserData.UserPassword) {
             SetText("Password can't be same as Current Password");
             setTimeout(() => {
-              SetText("");
+              SetText(""); // Clear error message after 800ms
             }, 800);
             return;
           }
           try {
+            // Update user data in Firebase
             const userRef = ref(AppDatabase, `/Users/${UserData.UserName}`);
             await set(userRef, {
               FirstName: UserData.FirstName,
               LastName: UserData.LastName,
               UserEmail: UserData.UserEmail,
               UserName: UserData.UserName,
-              UserPassword: md5(NewPasswordValue),
+              UserPassword: md5(NewPasswordValue), // Store hashed new password
               SelectedAvatar: SelectedAvatar,
             });
             SetText("Password Changed Successfully");
-            SetEditProfile(false);
+            SetEditProfile(false); // Disable password edit mode
             SetUserData({
               ...UserData,
-              UserPassword: md5(NewPasswordValue),
+              UserPassword: md5(NewPasswordValue), // Update global user data
             });
+
+            // Generate new session token and update session in Firebase
             const TokenRef = ref(
               AppDatabase,
               `/SessionTokens/${UserData.UserName}`
@@ -156,34 +171,38 @@ export default function MyProfile() {
               ),
               UpdatedSessionToken
             );
+
+            // Set new cookies with session token
             document.cookie =
               "userReference" + "=" + md5(UserData.UserEmail) + ";path=/";
             document.cookie = "authToken" + "=" + SessionToken + ";path=/";
+
             setTimeout(() => {
-              SetText("");
+              SetText(""); // Clear success message after 800ms
             }, 800);
             return;
           } catch (error) {
-            SetText(error);
+            SetText(error); // Handle error if update fails
             return;
           }
         } else {
           SetText("Password doesn't Match");
           setTimeout(() => {
-            SetText("");
+            SetText(""); // Clear error message after 800ms
           }, 800);
           return;
         }
       } else if (md5(PasswordValue) !== UserData.UserPassword) {
         SetText("Incorrect Current Password");
         setTimeout(() => {
-          SetText("");
+          SetText(""); // Clear error message after 800ms
         }, 800);
         return;
       }
     }
   }
 
+  // Handle avatar change and save
   async function HandelAvatarSave() {
     const userRef = ref(AppDatabase, `/Users/${UserData.UserName}`);
     try {
@@ -193,18 +212,18 @@ export default function MyProfile() {
         UserEmail: UserData.UserEmail,
         UserName: UserData.UserName,
         UserPassword: UserData.UserPassword,
-        SelectedAvatar: SelectedAvatar,
+        SelectedAvatar: SelectedAvatar, // Save the selected avatar
       });
-      SetEditAvatar(false);
-      SetUserData({ ...UserData, SelectedAvatar: SelectedAvatar });
+      SetEditAvatar(false); // Exit avatar editing mode
+      SetUserData({ ...UserData, SelectedAvatar: SelectedAvatar }); // Update global user data
       SetText("User Avatar Updated");
       setTimeout(() => {
-        SetText("");
+        SetText(""); // Clear success message after 800ms
       }, 800);
     } catch (error) {
-      SetText(error);
+      SetText(error); // Handle error if avatar update fails
       setTimeout(() => {
-        SetText("");
+        SetText(""); // Clear error message after 800ms
       }, 800);
     }
   }
@@ -212,16 +231,18 @@ export default function MyProfile() {
   return (
     <>
       <div className="MyProfileContainer">
+        {/* Profile form container */}
         <form
           className="MyProfileContent"
           style={FormColor}
           name="MyProfieForm"
           onSubmit={(event) => {
-            FormSubmitHandler(event);
+            FormSubmitHandler(event); // Handle form submit
           }}
         >
           <h3 className="FormHeader">My Profile</h3>
           <div className="SignUpAvatarContainer">
+            {/* Avatar selection and change buttons */}
             {EditAvatar ? (
               <button
                 className="ImageChangerButton"
@@ -239,17 +260,17 @@ export default function MyProfile() {
               </button>
             ) : null}
             <img
-              alt="..."
+              alt="User Avatar"
               className="SignUpProfileAvatar"
-              src={AvatarArray[SelectedAvatar]}
-            ></img>
+              src={AvatarArray[SelectedAvatar]} // Display selected avatar
+            />
             {EditAvatar ? (
               <button
                 className="AvatarButton"
                 type="button"
                 style={AvatarButtonStyle}
                 onClick={() => {
-                  HandelAvatarSave();
+                  HandelAvatarSave(); // Save avatar
                 }}
               >
                 <FontAwesomeIcon icon={faFloppyDisk} />
@@ -260,7 +281,7 @@ export default function MyProfile() {
                 type="button"
                 style={AvatarButtonStyle}
                 onClick={() => {
-                  SetEditAvatar(true);
+                  SetEditAvatar(true); // Enable avatar edit mode
                 }}
               >
                 <FontAwesomeIcon icon={faEdit} />
@@ -283,6 +304,8 @@ export default function MyProfile() {
               </button>
             ) : null}
           </div>
+
+          {/* Input fields for user profile */}
           <label htmlFor="MyProfileFirstName" className="MyProfileLabel">
             First Name:
           </label>
@@ -329,7 +352,7 @@ export default function MyProfile() {
               let TempPassword = event.target.value;
               SetPasswordValue(TempPassword);
             }}
-            readOnly={EditProfile ? false : true}
+            readOnly={EditProfile ? false : true} // Allow password editing if EditProfile is true
             required={EditProfile ? true : false}
           />
           {EditProfile ? (
@@ -353,7 +376,7 @@ export default function MyProfile() {
                 <div className="PasswordStrengthCheck">
                   <div
                     className="PasswordStrengthLevel"
-                    style={PasswordStrengthStyler}
+                    style={PasswordStrengthStyler} // Visualize password strength
                   ></div>
                 </div>
               ) : null}
@@ -377,7 +400,11 @@ export default function MyProfile() {
               />
             </div>
           ) : null}
+
+          {/* Display response message if any */}
           {Text ? <h5 style={ResponseTextStyler}>{Text}</h5> : null}
+
+          {/* Form submission buttons */}
           <div
             style={{
               display: "flex",
@@ -392,12 +419,12 @@ export default function MyProfile() {
                 className="FormSignupButton"
                 style={ButtonStyle}
                 onClick={() => {
-                  SetEditProfile(false);
-                  SetPasswordValue(UserData.UserPassword);
+                  SetEditProfile(false); // Cancel profile editing
+                  SetPasswordValue(UserData.UserPassword); // Reset password values
                   SetSelectedAvatar(UserData.SelectedAvatar);
                 }}
               >
-                Cancle
+                Cancel
               </button>
             ) : null}
             <button
@@ -407,11 +434,12 @@ export default function MyProfile() {
               value={ButtonValue}
               disabled={
                 ButtonValue === "Save"
-                  ? !PasswordMatch || PasswordValue === ""
+                  ? !PasswordMatch || PasswordValue === "" // Disable save button if password mismatch or empty
                   : false
               }
             >
-              {EditProfile ? "Save" : "Change Password"}
+              {EditProfile ? "Save" : "Change Password"}{" "}
+              {/* Change button text */}
             </button>
           </div>
         </form>

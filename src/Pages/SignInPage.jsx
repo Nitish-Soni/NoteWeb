@@ -1,22 +1,26 @@
 import { useContext, useState } from "react";
-import { ApplicationContext } from "../App";
-import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ApplicationContext } from "../App"; // Access the global context for app state
+import { Link } from "react-router-dom"; // For navigation between pages
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // For icons
 import {
   faApple,
   faGoogle,
   faMicrosoft,
-} from "@fortawesome/free-brands-svg-icons";
-import { AppDatabase, get, ref, set } from "../Database/Firebase";
-import md5 from "md5";
+} from "@fortawesome/free-brands-svg-icons"; // Social login icons
+import { AppDatabase, get, ref, set } from "../Database/Firebase"; // Firebase setup for accessing DB
+import md5 from "md5"; // MD5 hashing for passwords and session tokens
 
 export default function SignInPage() {
+  // Retrieving application context and setting state values
   const { Mode, SetLoggedIn } = useContext(ApplicationContext);
+
+  // Local state hooks for storing email, password, loader state, and response text
   const [EmailValue, SetEmailValue] = useState("");
   const [PasswordValue, SetPasswordValue] = useState("");
   const [Loader, SetLoader] = useState(false);
   const [Text, SetText] = useState("");
 
+  // Styles for various elements based on light/dark mode
   const ButtonStyle = {
     background: Mode ? "white" : "black",
     color: Mode ? "black" : "white",
@@ -34,29 +38,42 @@ export default function SignInPage() {
     padding: 0,
   };
 
+  // Function to handle form submission
   async function FormSubmitHandler(event) {
-    event.preventDefault();
-    SetLoader(true);
+    event.preventDefault(); // Prevent the default form submission behavior
+    SetLoader(true); // Show loader while processing the login request
+
     try {
+      // Hash the email for secure storage and retrieval
       const hashedEmail = md5(EmailValue);
       const userRef = ref(AppDatabase, `/Users/${hashedEmail}`);
+
+      // Fetch user data from the Firebase database
       const snapshot = await get(userRef);
       if (!snapshot.exists()) {
-        SetText("User does not Exist");
-        SetLoader(false);
+        SetText("User does not Exist"); // Inform user if email is not found
+        SetLoader(false); // Stop loader
         return;
       }
+
+      // If the user exists, retrieve their data
       const userData = snapshot.val();
       const storedPassword = userData.UserPassword;
+
+      // Compare stored password with the entered password (both are hashed)
       if (storedPassword !== md5(PasswordValue)) {
-        SetText("Incorrect Credentials");
+        SetText("Incorrect Credentials"); // Password mismatch
         SetLoader(false);
         return;
       }
+
+      // If credentials are correct, generate a session token
       let CurrentTime = Date.now();
       let SessionToken = md5(EmailValue + CurrentTime);
-      let TokenExpiryTime = CurrentTime + 3 * 86400000;
+      let TokenExpiryTime = CurrentTime + 3 * 86400000; // Set token expiration (3 days)
+
       try {
+        // Save the session token in Firebase under the SessionTokens node
         const TokenRef = ref(
           AppDatabase,
           `/SessionTokens/${md5(EmailValue)}/${SessionToken}`
@@ -67,18 +84,24 @@ export default function SignInPage() {
           ExpiryTime: TokenExpiryTime,
           SessionFor: EmailValue,
         });
+
+        // Set cookies for the session token and user reference
         document.cookie = "userReference" + "=" + md5(EmailValue) + ";path=/";
         document.cookie = "authToken" + "=" + SessionToken + ";path=/";
-        SetLoader(false);
-        SetLoggedIn(true);
-        SetEmailValue("");
-        SetPasswordValue("");
-        window.location.href = "/";
+
+        // Update the logged-in state
+        SetLoader(false); // Stop loader
+        SetLoggedIn(true); // Mark the user as logged in
+        SetEmailValue(""); // Clear the email field
+        SetPasswordValue(""); // Clear the password field
+        window.location.href = "/"; // Redirect to homepage after login
       } catch (error) {
+        // Handle any errors that occur while saving session token
         SetText("An error occurred: " + error.message);
         SetLoader(false);
       }
     } catch (error) {
+      // Handle any errors during user retrieval or token creation
       SetText("An error occurred: " + error.message);
       SetLoader(false);
     }
@@ -86,17 +109,21 @@ export default function SignInPage() {
 
   return (
     <>
+      {/* Main form container */}
       <div className="LoginContent">
+        {/* The login form */}
         <form
           name="LoginForm"
           id="LoginForm"
           className="LoginForm"
           style={FormColor}
           onSubmit={(event) => {
-            FormSubmitHandler(event);
+            FormSubmitHandler(event); // Call the form submit handler when the form is submitted
           }}
         >
           <h3 className="FormHeader">Login</h3>
+
+          {/* Email input field */}
           <label htmlFor="LoginEmail" className="FormLabel">
             Email:
           </label>
@@ -108,10 +135,12 @@ export default function SignInPage() {
             value={EmailValue}
             onChange={(event) => {
               let TempEmail = event.target.value;
-              SetEmailValue(TempEmail);
+              SetEmailValue(TempEmail); // Update email value when the input changes
             }}
-            required
+            required // Make this field required for form submission
           />
+
+          {/* Password input field */}
           <label htmlFor="LoginPassword" className="FormLabel">
             Password:
           </label>
@@ -123,14 +152,20 @@ export default function SignInPage() {
             value={PasswordValue}
             onChange={(event) => {
               let TempPassword = event.target.value;
-              SetPasswordValue(TempPassword);
+              SetPasswordValue(TempPassword); // Update password value when the input changes
             }}
-            required
+            required // Make this field required for form submission
           />
+
+          {/* Display error or success message */}
           {Text ? <h5 style={ResponseTextStyler}>{Text}</h5> : null}
+
+          {/* Login button with loader while submitting */}
           <button type="submit" className="FormLoginButton" style={ButtonStyle}>
             {Loader ? <div className="LoaderSpinner"></div> : "Log On"}
           </button>
+
+          {/* Links to reset password or sign up for a new account */}
           <div className="SignUpLink">
             Forgot Password ?{" "}
             <Link to="/signup" style={{ color: Mode ? "white" : "black" }}>
@@ -143,6 +178,8 @@ export default function SignInPage() {
               Sign Up
             </Link>
           </div>
+
+          {/* Separator for social login options */}
           <div className="FormSeperator">
             <div
               style={{
@@ -164,6 +201,8 @@ export default function SignInPage() {
               }}
             ></div>
           </div>
+
+          {/* Social media login icons */}
           <div className="LoginSocial">
             <FontAwesomeIcon icon={faGoogle} className="LoginSocialIcon" />
             <FontAwesomeIcon icon={faApple} className="LoginSocialIcon" />
