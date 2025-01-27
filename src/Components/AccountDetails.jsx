@@ -11,6 +11,7 @@ import { ApplicationContext } from "../App";
 import Cookies from "js-cookie";
 import { get, ref, remove } from "firebase/database";
 import { AppDatabase } from "../Database/Firebase";
+import { Link } from "react-router-dom";
 
 export default function AccountDetails() {
   const { Mode, SetShowAccountDetails, SetLoggedIn } =
@@ -53,14 +54,16 @@ export default function AccountDetails() {
         </div>
         <div className="AccountDetailsList">
           <ul className="AccountDetailsList">
-            <li
+            <Link
+              to="/myprofile"
               className="AccountDetailsListItem"
+              style={PannelStyle}
               onClick={() => {
                 SetShowAccountDetails(false);
               }}
             >
               <FontAwesomeIcon icon={faUser} /> My Profile
-            </li>
+            </Link>
             <li
               className="AccountDetailsListItem"
               onClick={() => {

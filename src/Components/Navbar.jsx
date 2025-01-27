@@ -20,6 +20,7 @@ export default function Navbar() {
     ShowNotification,
     SetShowAccountDetails,
     ShowAccountDetails,
+    UserData,
   } = useContext(ApplicationContext);
   const navbarStyle = {
     backgroundColor: Mode ? "white" : "black",
@@ -57,7 +58,11 @@ export default function Navbar() {
                   SetShowNotification(false);
                 }}
               >
-                <img src={AvatarArray[0]} alt="alt" className="AccountAvatar" />
+                <img
+                  src={AvatarArray[UserData.SelectedAvatar]}
+                  alt="alt"
+                  className="AccountAvatar"
+                />
               </button>
             </div>
           ) : (

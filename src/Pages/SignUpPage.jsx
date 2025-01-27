@@ -23,7 +23,6 @@ export default function SignUpPage() {
   const [PasswordMatch, SetPasswordMatch] = useState(false);
   const [Loader, SetLoader] = useState(false);
   const [Text, SetText] = useState("");
-
   const [SelectedAvatar, SetSelectedAvatar] = useState(0);
 
   const { Mode } = useContext(ApplicationContext);

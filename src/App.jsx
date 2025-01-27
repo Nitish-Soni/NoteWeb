@@ -11,6 +11,9 @@ import AccountDetails from "./Components/AccountDetails";
 import Cookies from "js-cookie";
 import { get, ref, set } from "firebase/database";
 import { AppDatabase } from "./Database/Firebase";
+import MyProfile from "./Pages/MyProfile";
+import md5 from "md5";
+import PageNotFound from "./Pages/PageNotFound";
 
 export const ApplicationContext = createContext("");
 
@@ -20,6 +23,7 @@ function App() {
   const [ShowNotification, SetShowNotification] = useState(false);
   const [ShowAccountDetails, SetShowAccountDetails] = useState(false);
   const [Loading, SetLoading] = useState(false);
+  const [UserData, SetUserData] = useState({});
 
   const ContentStyle = {
     backgroundColor: Mode ? "black" : "white",
@@ -43,12 +47,18 @@ function App() {
             } else {
               let TokenExpiryTime = CurrentTime + 3 * 86400000;
               try {
+                const UserRef = ref(
+                  AppDatabase,
+                  `/Users/${md5(snapshot.val().SessionFor)}`
+                );
                 await set(TokenRef, {
                   SessionToken: CookieValue,
                   CreateDate: CurrentTime,
                   ExpiryTime: TokenExpiryTime,
                   SessionFor: snapshot.val().SessionFor,
                 });
+                let UserDataRef = await get(UserRef);
+                SetUserData(UserDataRef.val());
                 SetLoading(false);
                 SetLoggedIn(true);
               } catch (error) {
@@ -96,6 +106,8 @@ function App() {
               ShowNotification,
               ShowAccountDetails,
               SetShowAccountDetails,
+              UserData,
+              SetUserData,
             }}
           >
             <Navbar />
@@ -104,11 +116,20 @@ function App() {
             <div className="content" style={ContentStyle}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                {LoggedIn ? null : (
+                {LoggedIn ? (
+                  <Route path="/login" element={<PageNotFound />} />
+                ) : (
                   <Route path="/login" element={<SignInPage />} />
                 )}
-                {LoggedIn ? null : (
+                {LoggedIn ? (
+                  <Route path="/signup" element={<PageNotFound />} />
+                ) : (
                   <Route path="/signup" element={<SignUpPage />} />
+                )}
+                {LoggedIn ? (
+                  <Route path="/myprofile" element={<MyProfile />} />
+                ) : (
+                  <Route path="/myprofile" element={<PageNotFound />} />
                 )}
               </Routes>
             </div>
