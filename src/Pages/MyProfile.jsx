@@ -308,6 +308,7 @@ export default function MyProfile() {
                 onClick={() => {
                   SetEditProfile(false);
                   SetPasswordValue(UserData.UserPassword);
+                  SetSelectedAvatar(UserData.SelectedAvatar);
                 }}
               >
                 Cancle
