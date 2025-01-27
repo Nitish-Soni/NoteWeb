@@ -122,19 +122,28 @@ function App() {
             {ShowAccountDetails && <AccountDetails />}
             <div className="content" style={ContentStyle}>
               <Routes>
+                {/* Home Page (always available) */}
                 <Route path="/" element={<HomePage />} />
+
+                {/* Login page */}
                 <Route
                   path="/login"
                   element={LoggedIn ? <Navigate to="/" /> : <SignInPage />}
                 />
+
+                {/* Sign Up page */}
                 <Route
                   path="/signup"
                   element={LoggedIn ? <Navigate to="/" /> : <SignUpPage />}
                 />
+
+                {/* My Profile page */}
                 <Route
                   path="/myprofile"
                   element={LoggedIn ? <MyProfile /> : <Navigate to="/login" />}
                 />
+
+                {/* Fallback route (for non-existing routes) */}
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
             </div>
