@@ -216,7 +216,8 @@
 }
 
 .LoginContent,
-.SignUpContent {
+.SignUpContent,
+.PageNotFoundContent {
   width: 100%;
   display: flex;
   justify-content: center;
